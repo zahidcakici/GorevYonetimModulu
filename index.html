@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Socket.IO</title>
+  </head>
+  <body>
+    <h1>Deneme Arayüzü</h1>
+    <button onclick="sendCreateMessage()">Send JobCreated</button>
+    <button onclick="sendUpdateMessage()">Send JobUpdate</button>
+    <ul id="messages"></ul>
+  </body>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    var socket = io();
+
+    function sendCreateMessage() {
+      const message = {
+        messageType: 'JobCreate',
+        externalReferenceId: "string",
+        taskList: [{
+          actionName: "Pickup",
+          locationId: "string",
+        }, {
+          actionName: "Deliver",
+          locationId: "string",
+        }],
+        jobStatus: "IN_PROGRESS",
+      };
+      socket.emit(message.messageType, message);
+    }
+
+    function sendUpdateMessage() {
+      const message = {
+        messageType: 'JobUpdateRobot',
+        externalReferenceId: "string",
+        lastCompletedTask: {
+          actionName: "Pickup",
+          locationId: "string",
+        },
+        jobStatus: "IN_PROGRESS",
+      };
+      socket.emit(message.messageType, message);
+    }
+
+    socket.on("JobUpdate", function (msg) {
+      var item = document.createElement("li");
+      item.textContent = JSON.stringify(msg);
+      messages.appendChild(item);
+      window.scrollTo(0, document.body.scrollHeight);
+    });
+
+    socket.on("BatteryInfo", function (msg) {
+      var item = document.createElement("li");
+      item.textContent = JSON.stringify(msg);
+      messages.appendChild(item);
+      window.scrollTo(0, document.body.scrollHeight);
+    });
+  </script>
+</html>
